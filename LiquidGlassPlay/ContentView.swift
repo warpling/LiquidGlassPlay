@@ -9,29 +9,83 @@ struct ContentView: View {
     @State private var showSheet = false
     @State private var shapes = ShapeSpec.make(count: 30)
 
+    @State private var shapesSpinning = false
+    @State private var spinning = false
+
     // MARK: – Body
     var body: some View {
         ZStack {
-            // colourful background shapes
             GeometryReader { geo in
                 ForEach(shapes) { spec in
                     spec.shape
                         .fill(spec.color)
-                        .frame(width: spec.size.width, height: spec.size.height)
-                        .rotationEffect(.degrees(spec.rotation))
+                        .frame(width: spec.size.width,
+                               height: spec.size.height)
+                        .rotationEffect(            // starting angle + spin
+                            .degrees(spec.rotation + (shapesSpinning ? 360 : 0))
+                        )
                         .position(x: geo.size.width  * spec.pos.x,
                                   y: geo.size.height * spec.pos.y)
                         .opacity(0.85)
                 }
             }
             .ignoresSafeArea()
-            
-            ZStack {}
-                .frame(width: 50, height: 50)
-                .glassEffect(.regular.tint(.purple.opacity(1)), in: RoundedRectangle(cornerSize: CGSize(width: 16, height: 16)))
+            .onAppear {                            // fire once
+                withAnimation(
+                    .linear(duration: 120)         // 2-minute revolution
+                        .repeatForever(autoreverses: false)
+                ) {
+                    shapesSpinning = true                // toggle to final state
+                }
+            }
 
-            // launcher button
-            VStack {
+            
+            VStack(alignment: .center) {
+                
+                
+                Text("Hello, World!")
+                    .font(.title)
+                    .padding()
+                    .glassEffect(.regular.tint(.orange).interactive())
+                    .onTapGesture {
+                        spinning.toggle()
+                    }
+                    .rotation3DEffect(
+                        .degrees(spinning ? 360 : 0),
+                        axis: (x: 0, y: 1, z: 0),
+                        perspective: 0.5
+                    )
+                    .animation(                        // repeats forever until `spinning` flips back
+                        .linear(duration: 2),
+                        value: spinning
+                    )
+                
+                Text("Hello, World!")
+                    .font(.title)
+                    .padding()
+                    .glassEffect(.regular.interactive())
+                    .onTapGesture {
+                        spinning.toggle()
+                    }
+                    .rotation3DEffect(
+                        .degrees(spinning ? 360 : 0),
+                        axis: (x: 0, y: 1, z: 0),
+                        perspective: 0.5
+                    )
+                    .animation(                        // repeats forever until `spinning` flips back
+                        .linear(duration: 2),
+                        value: spinning
+                    )
+                
+                Image(systemName: "eraser.fill")
+                         .frame(width: 80.0, height: 80.0)
+                         .font(.system(size: 36))
+                         .glassEffect(.regular.interactive().tint(.purple.opacity(0.8)))
+                
+                ZStack {}
+                    .frame(width: 50, height: 50)
+                    .glassEffect(.regular.tint(.purple.opacity(1)), in: RoundedRectangle(cornerSize: CGSize(width: 16, height: 16)))
+
                 Spacer()
                 Button("Show sheet") { showSheet = true }
                     .buttonStyle(.borderedProminent)
@@ -50,19 +104,69 @@ struct ContentView: View {
         }
         .scrollContentBackground(.hidden)
         .onAppear() {
-            showSheet = true
+//            showSheet = true
         }
     }
 }
 
 // MARK: – Sheet content ------------------------------------------------------
 private struct SheetView: View {
+    
+    @State private var spinning = false
+
     var body: some View {
         ScrollView {
-            Text(lorem)
-                .padding()
+            VStack {
+                
+                Text("Hello, World!")
+                    .font(.title)
+                    .padding()
+                    .glassEffect(.regular.tint(.orange).interactive())
+                    .onTapGesture {
+                        spinning.toggle()
+                    }
+                    .rotation3DEffect(
+                        .degrees(spinning ? 360 : 0),
+                        axis: (x: 0, y: 1, z: 0),
+                        perspective: 0.5
+                    )
+                    .animation(                        // repeats forever until `spinning` flips back
+                        .linear(duration: 2),
+                        value: spinning
+                    )
+                
+                Text("Hello, World!")
+                    .font(.title)
+                    .padding()
+                    .glassEffect(.regular.interactive())
+                    .onTapGesture {
+                        spinning.toggle()
+                    }
+                    .rotation3DEffect(
+                        .degrees(spinning ? 360 : 0),
+                        axis: (x: 0, y: 1, z: 0),
+                        perspective: 0.5
+                    )
+                    .animation(                        // repeats forever until `spinning` flips back
+                        .linear(duration: 2),
+                        value: spinning
+                    )
+
+
+                Image(systemName: "eraser.fill")
+                         .frame(width: 80.0, height: 80.0)
+                         .font(.system(size: 36))
+                         .glassEffect(.regular.tint(.purple))
+                
+                ZStack {}
+                    .frame(width: 320, height: 180)
+                    .glassEffect(           // its own Liquid-Glass, but…
+                                in: .rect
+                            )
+                Text(lorem)
+                    .padding()
+           }
         }
-//        .scrollContentBackground(.hidden)   // still needed for Lists
     }
 
     private let lorem =
